@@ -255,6 +255,42 @@ if data is not None:
             st.metric("Densidade", f"{density:.4f}")
             st.caption("Densidade: Razão entre arestas existentes e possíveis (0-1). Redes densas têm mais conexões.")
 
+            # Coeficientes de Clustering
+            st.subheader("Coeficientes de Clustering")
+
+            # Calcular clustering global (para o grafo não direcionado)
+            undirected_G = G.to_undirected()
+            global_clustering = nx.average_clustering(undirected_G)
+            st.metric("Coeficiente de Clustering Global (Médio)", f"{global_clustering:.4f}")
+            st.caption("""
+            Coeficiente de Clustering Global: Mede a tendência dos nós de formarem clusters. 
+            Valores próximos de 1 indicam que a rede tem muitos triângulos (amigos de amigos são amigos).
+            """)
+
+            # Calcular clustering local para os 5 nós com maior grau
+            top_5_nodes = sorted(G.nodes(), key=lambda x: G.degree(x), reverse=True)[:5]
+            local_clustering = {}
+
+            for node in top_5_nodes:
+                local_clustering[node] = nx.clustering(undirected_G, node)
+
+            # Criar DataFrame para exibir os resultados
+            clustering_df = pd.DataFrame({
+                'Clube': list(local_clustering.keys()),
+                'Coeficiente de Clustering Local': list(local_clustering.values()),
+                'Grau': [G.degree(node) for node in local_clustering.keys()]
+            })
+
+            st.write("Coeficiente de Clustering Local para os 5 clubes com maior grau:")
+            st.dataframe(
+                clustering_df.sort_values('Coeficiente de Clustering Local', ascending=False),
+                hide_index=True
+            )
+            st.caption("""
+            Coeficiente de Clustering Local: Mede quão conectados estão os vizinhos de um nó. 
+            Valores altos indicam que os parceiros de transferência de um clube também tendem a fazer negócios entre si.
+            """)
+
         with col2:
             scc = nx.number_strongly_connected_components(G)
             wcc = nx.number_weakly_connected_components(G)
