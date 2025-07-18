@@ -263,6 +263,14 @@ if data is not None:
             st.metric("Componentes Fracamente Conectados", wcc)
             st.caption("Componentes conectados se ignorarmos a direção das arestas.")
 
+            if connected_only:
+                # Calcular diâmetro para o maior componente fracamente conectado
+                undirected_G = G.to_undirected()
+                if nx.is_connected(undirected_G):
+                    diameter = nx.diameter(undirected_G)
+                    st.metric("Diâmetro", diameter)
+                    st.caption("Diâmetro: Maior distância entre quaisquer dois nós na rede.")
+
         with col3:
             try:
                 assortativity = nx.degree_assortativity_coefficient(G)
@@ -271,13 +279,10 @@ if data is not None:
                     "Assortatividade: Tendência de nós se conectarem a nós similares (positivo) ou diferentes (negativo).")
 
                 if connected_only:
-                    # Calcular diâmetro e periferia para o maior componente fracamente conectado
+                    # Calcular periferia para o maior componente fracamente conectado
                     undirected_G = G.to_undirected()
                     if nx.is_connected(undirected_G):
-                        diameter = nx.diameter(undirected_G)
                         periphery = nx.periphery(undirected_G)
-                        st.metric("Diâmetro", diameter)
-                        st.caption("Diâmetro: Maior distância entre quaisquer dois nós na rede.")
                         st.markdown(f"""
                                 **Periferia**  
                                 <small>{", ".join(periphery)}</small>
