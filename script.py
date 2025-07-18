@@ -277,17 +277,6 @@ if data is not None:
                 st.metric("Assortatividade", f"{assortativity:.4f}")
                 st.caption(
                     "Assortatividade: Tendência de nós se conectarem a nós similares (positivo) ou diferentes (negativo).")
-
-                if connected_only:
-                    # Calcular periferia para o maior componente fracamente conectado
-                    undirected_G = G.to_undirected()
-                    if nx.is_connected(undirected_G):
-                        periphery = nx.periphery(undirected_G)
-                        st.markdown(f"""
-                                **Periferia**  
-                                <small>{", ".join(periphery)}</small>
-                                """, unsafe_allow_html=True)
-                        st.caption("Periferia: Nós com a maior excentricidade (distância máxima a qualquer outro nó).")
             except Exception as e:
                 st.write(f"Assortatividade: Não calculável ({str(e)})")
 
@@ -298,6 +287,17 @@ if data is not None:
                 st.metric("Valor total das transferências (€)", f"{total_transfers:,.2f}M")
                 st.metric("Valor médio por transferência (€)", f"{avg_transfer:,.2f}M")
 
+            if connected_only:
+                # Calcular periferia para o maior componente fracamente conectado
+                undirected_G = G.to_undirected()
+                if nx.is_connected(undirected_G):
+                    periphery = nx.periphery(undirected_G)
+                    st.markdown(f"""
+                            **Periferia**  
+                            <small>{", ".join(periphery)}</small>
+                            """, unsafe_allow_html=True)
+                    st.caption("Periferia: Nós com a maior excentricidade (distância máxima a qualquer outro nó).")
+                    
         # Distribuição de grau
         st.subheader("Distribuição de Grau")
 
